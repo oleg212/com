@@ -82,10 +82,59 @@ namespace Serial_Communication_WPF
             recieved_data = serial.ReadExisting(); 
             Dispatcher.Invoke(DispatcherPriority.Send, new UpdateUiTextDelegate(WriteData), recieved_data);
         }
+
+        
+        string normal = "";
         private void WriteData(string text)
         {
             // Assign the value of the recieved_data to the RichTextBox.
-            para.Inlines.Add(text);
+            int indexOfSubstring = text.IndexOf("$GPGGA");
+            int indexOftab= text.IndexOf('\n');
+            if (indexOftab > -1)
+            {
+                normal+=text.Substring(0, indexOftab);
+            }
+            else
+            {
+                normal += text;
+            }
+
+
+
+
+
+            if (indexOftab > -1)
+            {
+                if (normal.IndexOf("GPGGA") != -1)
+                {
+                    
+                    normal = normal.Substring(normal.IndexOf("GPGGA"));
+                    string[] gpsdata = normal.Split(',');
+                    string output = " LAT: " + gpsdata[2] + " LATDIR: " + gpsdata[3] + " LON: " + gpsdata[4] + " LONDIR: " + gpsdata[5]+'\n';
+                    string timeb = gpsdata[1];
+                    string timec = timeb.Substring(0, 2) + ':' + timeb.Substring(2, 2) + ':' + timeb.Substring(4, 2);
+
+                    var time = TimeSpan.Parse(timec);
+                    double latitude = double.Parse(gpsdata[2], System.Globalization.CultureInfo.InvariantCulture);
+                    if (gpsdata[3].Equals('S'))
+                    {
+                        latitude *= -1;
+                    }
+
+                    double longitude = double.Parse(gpsdata[4], System.Globalization.CultureInfo.InvariantCulture);
+                    if (gpsdata[5].Equals('W'))
+                    {
+                        longitude *= -1;
+                    }
+
+
+                    para.Inlines.Add(time.ToString()+output);
+                }
+
+                //para.Inlines.Add(normal);
+                normal = text.Substring(indexOftab);
+            }
+            //para.Inlines.Add(text);
             mcFlowDoc.Blocks.Add(para);
             Commdata.Document = mcFlowDoc;
         }
