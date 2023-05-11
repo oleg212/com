@@ -64,7 +64,7 @@ namespace Serial_Communication_WPF
                 serial.ReadTimeout = 200;
                 serial.WriteTimeout = 50;
                 serial.Open();
-                    //Sets button State and Creates function call on data recieved
+                    
                 Connect_btn.Content = "Disconnect";
                 client.Connect();
                 serial.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(Recieve);
@@ -92,7 +92,6 @@ namespace Serial_Communication_WPF
         private delegate void UpdateUiTextDelegate(string text);
         private void Recieve(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
-            // Collecting the characters received to our 'buffer' (string).
             recieved_data = serial.ReadExisting();
             Dispatcher.Invoke(DispatcherPriority.Send, new UpdateUiTextDelegate(WriteData), recieved_data);
         }
@@ -113,7 +112,6 @@ namespace Serial_Communication_WPF
                 return;
             }
             string final = "";
-            // Assign the value of the recieved_data to the RichTextBox.
             int indexOfSubstring = text.IndexOf("$GPGGA");
             int indexOftab = text.IndexOf('\n');
             if (indexOftab > -1)
@@ -204,7 +202,6 @@ namespace Serial_Communication_WPF
 
                 }
 
-                //para.Inlines.Add(normal);
                 if (result.Contains("ERROR") == false)
                 {
                     normal = text.Substring(indexOftab);
@@ -212,7 +209,6 @@ namespace Serial_Communication_WPF
                                                                    
                 }
             }
-            //para.Inlines.Add(text);
             
                 mcFlowDoc.Blocks.Add(para);
                 Commdata.Document = mcFlowDoc;
@@ -274,8 +270,7 @@ namespace Serial_Communication_WPF
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {   
-                //var d_data = serial.ReadExisting();
-                //recieved_data = serial.ReadExisting();
+
                 Dispatcher.Invoke(DispatcherPriority.Send, new UpdateUiTextDelegate(WriteData), recieved_data);
                 if (client == null) { return; }
                 SshCommand command = client.CreateCommand("cat /tmp/4ginfo_tmp");
